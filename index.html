@@ -1,0 +1,434 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SB Product Catalogue</title> 
+
+<style>
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f5f5f5;color:#333;text-align:center;}
+.splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;z-index:10;}
+.logo-splash{width:30vw;animation:fadeOut 3s forwards 2s;}
+@keyframes fadeOut{to{opacity:0;transform:scale(4);}}
+.hidden{display:none;}
+.header{position:sticky;top:0;background:#fff;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:5;} /* Changed to column for search bar */
+.logo{height:60px;}
+.header h1 { margin: 0; font-size: 1.5em; }
+
+/* NEW: Search Bar Style */
+.search-container {
+    width: 90%;
+    max-width: 600px;
+    margin-top: 10px;
+}
+.search-container input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 1em;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.main{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px;padding:20px;max-width:1200px;margin:auto;}
+.card{background:#fff;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.1);overflow:hidden; cursor: pointer; transition: transform 0.2s;} 
+.card:hover{transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.2);} 
+.card img{width:100%;height:160px;object-fit:cover; pointer-events: none;} 
+.card .info{padding:10px;text-align:left;}
+.card .name{font-weight:bold;font-size:1.1em;}
+.card .desc{color:#555;font-size:0.9em; min-height: 1.3em; overflow: hidden; text-overflow: ellipsis; display: block; white-space: nowrap;} 
+.price{font-weight:bold;margin-top:8px;}
+.play{background:#007bff;color:#fff;padding:6px 10px;border:none;border-radius:5px;margin-top:8px;cursor:pointer; display: block; width: 100%; box-sizing: border-box;}
+.pagination-controls {
+    text-align: center;
+    padding: 20px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+.pagination-controls button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 1em;
+}
+.pagination-controls button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+.pagination-controls button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+#pageInfo {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #555;
+}
+.footer {
+    background-color: #333;
+    color: white;
+    padding: 15px 10px;
+    text-align: center;
+    margin-top: 30px;
+    font-size: 0.9em;
+}
+.footer p {
+    margin: 0;
+}
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.8); 
+    padding-top: 50px;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; 
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%; 
+    max-width: 900px; 
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    text-align: left; 
+}
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 35px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+.close-btn:hover, .close-btn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+#modalDetails {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 30px;
+    justify-content: space-between; 
+}
+.product-details {
+    flex: 1;
+    min-width: 300px;
+    max-width: 45%; 
+}
+.product-details img {
+    width: 100%;
+    height: auto;
+    max-height: 250px; 
+    object-fit: contain; 
+    border-radius: 5px;
+    margin-bottom: 15px;
+    background-color: #eee;
+}
+.video-player {
+    flex: 2;
+    min-width: 400px;
+}
+.video-player video {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+.product-details .price {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 1em;
+    font-weight: normal;
+    color: #444;
+}
+.product-details .price strong {
+    font-size: 1.1em;
+    color: #d9534f;
+}
+
+.contact-info {
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+.contact-info p {
+    margin: 5px 0;
+}
+.contact-info a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+.details-list-container h3 {
+    margin-top: 0;
+    color: #007bff;
+    border-bottom: 2px solid #007bff; 
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+.details-list-container ul {
+    list-style-type: disc; 
+    padding-left: 20px;
+    margin-top: 10px;
+    text-align: left;
+    color: #444;
+}
+.details-list-container li {
+    margin-bottom: 8px; 
+    font-size: 1em;
+    line-height: 1.4;
+}
+@media (max-width: 768px) {
+    #modalDetails {
+        flex-direction: column; 
+    }
+    .product-details, .video-player {
+        min-width: 100%;
+        max-width: 100%;
+    }
+    .video-player video {
+        max-height: 250px; 
+    }
+    .header {
+        padding: 10px;
+    }
+}
+</style>
+</head>
+<body>
+<div class="splash">
+  <img src="images/Shop Logo.png" class="logo-splash" alt="Shop Logo" />
+</div>
+
+<header class="header hidden">
+    <div>
+        <img src="images/Shop Logo.png" class="logo" alt="Shop Logo" />
+        <h1>SB Product Catalogue</h1>
+    </div>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search by Product Name..." onkeyup="filterProducts()">
+    </div>
+</header>
+
+<main class="main hidden" id="productContainer"></main>
+
+<div class="pagination-controls hidden">
+    <button id="prevPage" disabled>ᐸ Previous Page</button>
+    <span id="pageInfo">Page 1 of X</span>
+    <button id="nextPage">Next Page ᐳ</button>
+</div>
+
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <div id="modalDetails">
+      </div>
+  </div>
+</div>
+
+<footer class="footer hidden">
+    <p>Shop Address: Sekendar Tower,Level-3,R-1,Fallpotti Mosjid Road,Mirpur-10,Dhaka-1216</p>
+</footer>
+
+<script>
+const products = [{"id": 1, "name": "4 Layer Corner Trolly Rack", "description": "Stainless Steel/Plastic; Height: 35inch; Width: 14inch; Weight: 1.025kg; Color: White; Ideal for kitchen or bathroom storage.", "image": "images/Product Image1.jpg", "video": "videos/Product Video1.mp4", "price": "600"}, {"id": 2, "name": "5 Layer Vertical Shoe Rack", "description": "Stainless Steel/Plastic; Height: 101.6cm; Width: 26.67cm; Weight: 1.590kg; Color: White; Space-saving organizer for shoes.", "image": "images/Product Image2.jpg", "video": "videos/Product Video2.mp4", "price": ""}, {"id": 3, "name": "SB 4 Layer Storage Basket", "description": "Plastic; Height: 86.36cm; Width: 40.64cm; Weight: 1.985kg; Color: Green, Blue, Pink, Off White; Multipurpose storage unit.", "image": "images/Product Image3.jpg", "video": "videos/Product Video3.mp4", "price": ""}, {"id": 4, "name": "5 layer Multifunctional Shoe Organizer Rack", "description": "Plastic; Height: 88.63cm; Width: 27.94cm; Weight: 1.135kg; Color: Orange, Green, Blue; Light and easy to assemble.", "image": "images/Product Image4.jpg", "video": "videos/Product Video4.mp4", "price": ""}, {"id": 5, "name": "Narrow Type Gap Storage Trolly Rack", "description": "Stainless Steel/Plastic; Height: 86.36cm; Width: 40.64cm; Weight: 1.285kg; Color: White; Fits perfectly in narrow gaps.", "image": "images/Product Image5.jpg", "video": "videos/Product Video5.mp4", "price": ""}, {"id": 6, "name": "Wide Type Gap Storage Trolly Rack", "description": "Stainless Steel/Plastic; Height: 86.36cm; Width: 40.64cm; Weight: 1.680kg; Color: White, Black; Wide design for more capacity.", "image": "images/Product Image6.jpg", "video": "videos/Product Video6.mp4", "price": ""}, {"id": 7, "name": "Wall Mounted Storage Rack", "description": "Plastic; Height: 71.12cm; Width: 40.64cm; Weight: 1.550kg; Color: White, Black; Punch-free installation, great for bathrooms or kitchens.", "image": "images/Product Image7.jpg", "video": "videos/Product Video7.mp4", "price": ""}, {"id": 8, "name": "5 layer food cover", "description": "Plastic; Height: 38.1cm; Width: 25.4cm; Weight: 935g; Color: White, Green, Yellow; Keeps food warm and protected from insects.", "image": "images/Product Image8.jpg", "video": "videos/Product Video8.mp4", "price": ""}, {"id": 9, "name": "12pcs Adjustable Fridge Dividers", "description": "Plastic; Organize your fridge, drawers, or cabinets effortlessly; Customizable length.", "image": "images/Product Image9.jpg", "video": "videos/Product Video9.mp4", "price": ""}, {"id": 10, "name": "Transparent Spoon Holder", "description": "Plastic; Convenient and hygienic spoon holder.", "image": "images/Product Image10.jpg", "video": "videos/Product Video10.mp4", "price": ""}, {"id": 11, "name": "6pcs Set Drawer Storage Divider", "description": "Plastic; Adjustable dividers to organize drawers easily.", "image": "images/Product Image11.jpg", "video": "videos/Product Video11.mp4", "price": ""}, {"id": 12, "name": "2 Pcs Set Bag Holder", "description": "Plastic; Clips to hold plastic bags open for easy filling.", "image": "images/Product Image12.jpg", "video": "videos/Product Video12.mp4", "price": ""}, {"id": 13, "name": "Vegetable Fruit Washing Basket Strainer", "description": "Plastic; Dual-layer basket for washing and draining fruits and vegetables.", "image": "images/Product Image13.jpg", "video": "videos/Product Video13.mp4", "price": ""}, {"id": 14, "name": "Sliding Egg Tray for Fridge & Kitchen", "description": "Plastic; Space-saving sliding design for egg storage.", "image": "images/Product Image14.jpg", "video": "videos/Product Video14.mp4", "price": ""}, {"id": 15, "name": "4 Layer Egg Dispenser", "description": "Plastic; Gravity-fed egg dispenser for easy access.", "image": "images/Product Image15.jpg", "video": "videos/Product Video15.mp4", "price": ""}, {"id": 16, "name": "Double-Layer Egg Dispenser", "description": "Plastic; Compact double-layer egg storage solution.", "image": "images/Product Image16.jpg", "video": "videos/Product Video16.mp4", "price": ""}, {"id": 17, "name": "2 In1 Dumpling Maker", "description": "Plastic; Simple tool for quickly making perfect dumplings.", "image": "images/Product Image17.jpg", "video": "videos/Product Video17.mp4", "price": ""}, {"id": 18, "name": "BIG Size Pitha Maker", "description": "Plastic; H:30.48cm; W:13.97cm; Wt:240g; Color: Orange; Easy and safe Pitha making tool.", "image": "images/Product Image18.jpg", "video": "videos/Product Video18.mp4", "price": ""}, {"id": 19, "name": "Foldable Baby Potty Seat", "description": "Plastic; H:22.86cm; W:15.24cm; Wt:426g; Color: Blue, Green, Pink; Portable and comfortable training seat for toddlers.", "image": "images/Product Image19.jpg", "video": "videos/Product Video19.mp4", "price": ""}, {"id": 20, "name": "Multi-Function Four Grid Spice Box", "description": "Plastic/Crystal Plastic; H:7.62cm; W:13.97cm; Wt:180g; Color: White, Brown; Four separate compartments for different spices.", "image": "images/Product Image20.jpg", "video": "videos/Product Video20.mp4", "price": ""}, {"id": 21, "name": "None-Stick Meatball Maker", "description": "Plastic; H:20.32cm; W:10.16cm; Wt:105g; Color: White, Yellow; Easy and safe Pitha making tool.", "image": "images/Product Image21.jpg", "video": "videos/Product Video21.mp4", "price": ""}, {"id": 22, "name": "Round Ice Cubes Tray", "description": "Plastic; H:17.78cm; W:10.16cm; Wt:50g; Color: Pink, Blue; Makes 33 round ice cubes.", "image": "images/Product Image22.jpg", "video": "videos/Product Video22.mp4", "price": ""}, {"id": 23, "name": "Metal Mosquito Coil Stand", "description": "Metal; H:20.32cm; W:12.7cm; Wt:0.215kg; Color: Golden, Black; Decorative and safe coil stand.", "image": "images/Product Image23.jpg", "video": "videos/Product Video23.mp4", "price": ""}, {"id": 24, "name": "Iron Frame Punch Free Storage Organizer Shelf", "description": "Metal; H:45.72cm; W:12.7cm; Wt:165g; Color: Black; Punch Free wall-mounted shelf.", "image": "images/Product Image24.jpg", "video": "videos/Product Video24.mp4", "price": ""}, {"id": 25, "name": "Metal Kitchen Hook", "description": "Metal; H:5.08cm; W:5.08cm; Wt:30g; Color: Black, Silver; Self-adhesive utility hook.", "image": "images/Product Image25.jpg", "video": "videos/Product Video25.mp4", "price": ""}, {"id": 26, "name": "Stainless Steel Finger Guard", "description": "Stainless Steel; Protects fingers while chopping vegetables.", "image": "images/Product Image26.jpg", "video": "videos/Product Video26.mp4", "price": ""}, {"id": 27, "name": "3PCS/set Gardening Tools", "description": "Plastic/Metal; Includes shovel, rake, and trowel for basic gardening tasks.", "image": "images/Product Image27.jpg", "video": "videos/Product Video27.mp4", "price": ""}, {"id": 28, "name": "SB-052 Desktop Fan", "description": "Plastic/Electronics; Compact USB-powered desktop fan.", "image": "images/Product Image28.jpg", "video": "videos/Product Video28.mp4", "price": ""}, {"id": 29, "name": "SB2501F Mini Portable Fan", "description": "Plastic/Electronics; Mini rechargeable fan for portable use.", "image": "images/Product Image29.jpg", "video": "videos/Product Video29.mp4", "price": ""}, {"id": 30, "name": "Nursing Pillow for Pregnant Women", "description": "Cotton/Polyester; Comfortable, supportive pillow for expecting and new mothers.", "image": "images/Product Image30.jpg", "video": "videos/Product Video30.mp4", "price": ""}, {"id": 31, "name": "Cycling Hoodie Mask", "description": "Fabric; Protects face from dust and sun during cycling.", "image": "images/Product Image31.jpg", "video": "videos/Product Video31.mp4", "price": ""}, {"id": 32, "name": "Baby Safety Helmet", "description": "Foam/Fabric; Protective helmet for babies learning to crawl or walk.", "image": "images/Product Image32.jpg", "video": "videos/Product Video32.mp4", "price": ""}];
+
+// --- PAGINATION VARIABLES ---
+const PRODUCTS_PER_PAGE = 15;
+let currentPage = 1;
+let filteredProducts = products; // Nicher shob product thakbe
+let totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+
+// --- MODAL & ELEMENT SELECTION ---
+const productModal = document.getElementById('productModal');
+const modalDetails = document.getElementById('modalDetails');
+const closeBtn = document.querySelector('.close-btn');
+const container = document.getElementById('productContainer');
+const pageInfoSpan = document.getElementById('pageInfo');
+const prevBtn = document.getElementById('prevPage');
+const nextBtn = document.getElementById('nextPage');
+
+// Contact Numbers for Modal
+const CONTACT_INFO = `
+    <div class="contact-info">
+        <p><strong>Contact Numbers:</strong></p>
+        <p>
+            <a href="tel:01611006666">01611006666</a> / 
+            <a href="tel:01908528987">01908528987</a>
+        </p>
+    </div>
+`;
+
+
+const showProductDetails = (product) => {
+    const detailsArray = product.description.split(';').map(d => d.trim()).filter(d => d.length > 0);
+    const detailsList = detailsArray.length > 0
+        ? `<ul>${detailsArray.map(item => `<li>${item}</li>`).join('')}</ul>`
+        : `<p>No detailed specifications available.</p>`;
+
+    // 1. Modal Content Inject (Updated with CONTACT_INFO)
+    modalDetails.innerHTML = `
+        <div class="product-details">
+            <h2>${product.name}</h2>
+            <img src="${product.image}" alt="${product.name}" 
+                 onerror="this.onerror=null; console.error('Image Load Fail: ${product.image}'); this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'300\\' height=\\'200\\' viewBox=\\'0 0 300 200\\'><rect width=\\'300\\' height=\\'200\\' fill=\\'#ccc\\'/><text x=\\'150\\' y=\\'100\\' font-family=\\'Arial\\' font-size=\\'20\\' fill=\\'#333\\' text-anchor=\\'middle\\'>Image Missing! Check Path: ${product.image}</text></svg>';">
+            
+            <h3>Specifications</h3>
+            <div class="details-list-container">
+                 ${detailsList}
+            </div>
+            
+            <div class="price">
+                <p><strong>Price:</strong> (Contact for current price)</p>
+            </div>
+            ${CONTACT_INFO}
+        </div>
+        <div class="video-player">
+            <h3>Product Video</h3>
+            <video controls autoplay>
+                <source src="${product.video}" type="video/mp4" 
+                        onerror="alert('Video File Not Found! Check file name: ${product.video}');">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    `;
+
+    // 2. Show Modal
+    productModal.style.display = 'block';
+};
+
+// Close Modal Logic
+closeBtn.onclick = () => {
+    productModal.style.display = 'none';
+    const videoElement = modalDetails.querySelector('video');
+    if (videoElement) {
+        videoElement.pause();
+    }
+};
+window.onclick = (event) => {
+    if (event.target == productModal) {
+        productModal.style.display = 'none';
+        const videoElement = modalDetails.querySelector('video');
+        if (videoElement) {
+            videoElement.pause();
+        }
+    }
+};
+
+
+// --- PAGINATION FUNCTIONS (Updated to use filteredProducts) ---
+const renderProductsForPage = (page) => {
+    container.innerHTML = ''; 
+    
+    // Calculate start and end index
+    const startIndex = (page - 1) * PRODUCTS_PER_PAGE;
+    const endIndex = startIndex + PRODUCTS_PER_PAGE;
+    
+    const productsToRender = filteredProducts.slice(startIndex, endIndex);
+
+    productsToRender.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.onclick = () => showProductDetails(p);
+
+        const previewDesc = p.description.split(';')[0].trim();
+        
+        div.innerHTML = `
+          <img src="${p.image}" alt="${p.name}" 
+               onerror="this.onerror=null; this.style.backgroundColor='#ffe0e0'; this.style.padding='10px'; console.error('Image Load Fail: ${p.image}');">
+          <div class="info">
+            <div class="name">${p.name}</div>
+            <div class="desc">${previewDesc ? previewDesc + '...' : 'Details...'}</div>
+            <div class="price">Price:</div>
+            <button class="play" style="pointer-events: none;">View Details / Video</button>
+          </div>`;
+        container.appendChild(div);
+    });
+
+    // Update pagination controls
+    totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+    pageInfoSpan.textContent = `Page ${currentPage} of ${totalPages}`;
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+    // Show/hide pagination based on results
+    const paginationControls = document.querySelector('.pagination-controls');
+    if (filteredProducts.length > PRODUCTS_PER_PAGE) {
+        paginationControls.classList.remove('hidden');
+    } else {
+        paginationControls.classList.add('hidden');
+    }
+
+    // Scroll to top of the page after rendering
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// --- NEW: Search/Filter Function ---
+const filterProducts = () => {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    // Filter product list
+    filteredProducts = products.filter(product => {
+        // Check product name and description
+        return product.name.toLowerCase().includes(searchTerm) || 
+               product.description.toLowerCase().includes(searchTerm);
+    });
+
+    // Reset to first page and re-render
+    currentPage = 1;
+    renderProductsForPage(currentPage);
+};
+
+
+prevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderProductsForPage(currentPage);
+    }
+});
+
+nextBtn.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+        currentPage++;
+        renderProductsForPage(currentPage);
+    }
+});
+
+window.onload = () => {
+  const splash = document.querySelector('.splash');
+  const header = document.querySelector('.header');
+  const main = document.querySelector('.main');
+  const paginationControls = document.querySelector('.pagination-controls');
+  const footer = document.querySelector('.footer');
+  
+  // Splash Screen Logic
+  setTimeout(() => {
+    splash.style.display = 'none';
+    header.classList.remove('hidden');
+    main.classList.remove('hidden');
+    paginationControls.classList.remove('hidden'); // Show pagination
+    footer.classList.remove('hidden'); // Show footer
+    
+    // Initial render of the first page
+    renderProductsForPage(currentPage);
+  }, 4000);
+};
+</script>
+</body>
+</html>
+
